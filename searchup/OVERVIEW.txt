@@ -1,0 +1,146 @@
+================================================================================
+ADDRESS DICTIONARY SEARCH SYSTEM - PROJECT OVERVIEW
+================================================================================
+
+PROJECT DESCRIPTION
+-------------------
+This is a high-performance address dictionary search system implemented in C.
+The system reads Australian address records from CSV files and performs efficient
+fuzzy matching queries using a Patricia Trie data structure with bit-level
+operations for optimal search performance.
+
+WHAT DOES IT DO?
+----------------
+- Loads address records from CSV files into an optimized search structure
+- Performs fast prefix-based searches using bit-wise Patricia Trie navigation
+- Supports fuzzy matching with edit distance calculations for approximate queries
+- Returns matching addresses with performance metrics (comparisons, nodes accessed)
+- Outputs results both to stdout (summary) and output files (detailed records)
+
+KEY FEATURES
+------------
+* Patricia Trie: Bit-level prefix matching for maximum efficiency
+* Edit Distance: Dynamic programming algorithm for fuzzy string matching
+* Dual Output: Summary statistics and detailed match results
+* Performance Metrics: Tracks bit comparisons, string comparisons, node accesses
+* Large Dataset Support: Designed for efficient searching of large address databases
+
+CORE COMPONENTS
+---------------
+1. ptrie.c/h        - Patricia Trie implementation (bit-wise search structure)
+2. dict.c/h         - Dictionary wrapper (CSV parsing, search coordination)
+3. record.c/h       - Address record structure (35 fields per record)
+4. result.c/h       - Search result container (matches + metrics)
+5. list.c/h         - Generic linked list (used for multiple matches per node)
+6. bit.c/h          - Bit manipulation utilities (getBit, bit comparison)
+7. main.c           - Entry point and query processing loop
+
+DATA STRUCTURE HIGHLIGHTS
+--------------------------
+Patricia Trie Node:
+  - prefix_bit: number of bits in the prefix
+  - prefix: the bit string itself
+  - left/right: binary child pointers
+  - data_list: linked list of records at leaves
+  - is_leaf: indicates if node is a leaf
+
+Address Record:
+  - 35 string fields (PFI, EZI_ADD, ROAD_NAME, POSTCODE, etc.)
+  - x,y coordinates (long double)
+  - Dynamically allocated strings (max 127 chars each)
+
+QUICK START
+-----------
+Build:
+  make
+
+Clean:
+  make clean
+
+Run:
+  ./dict2 <stage> <input_csv> <output_file> < <query_input>
+
+Example:
+  ./dict2 2 tests/dataset_1.csv output.out < tests/test1.in
+
+Test Validation:
+  ./dict2 2 tests/dataset_1.csv output.out < tests/test1.in > stdout.out
+  diff output.out matching_results/test1.s2.out
+  diff stdout.out matching_results/test1.s2.stdout.out
+
+HOW IT WORKS
+------------
+1. Parse CSV file and build Patricia Trie from address records
+2. Read query strings from stdin (one per line)
+3. Navigate trie using bit-wise prefix comparisons
+4. At leaf nodes, perform edit distance calculations for fuzzy matching
+5. Output summary statistics to stdout
+6. Write detailed matching records to output file
+
+ALGORITHM COMPLEXITY
+--------------------
+- Trie insertion: O(k) where k is the key length in bits
+- Trie search: O(k) where k is the query length in bits
+- Edit distance: O(m*n) where m,n are string lengths
+- Space: O(total bits in all keys + record data)
+
+WHY PATRICIA TRIE?
+------------------
+Unlike standard tries, Patricia Tries eliminate single-child chains by storing
+prefixes in nodes, reducing memory usage and improving cache performance. The
+bit-level implementation allows for more granular branching decisions compared
+to character-level tries.
+
+TESTING
+-------
+Test files are organized in:
+  tests/           - Input CSV datasets and query files
+  matching_results/ - Expected outputs for validation
+
+Test naming convention:
+  testN.in          - Query input for test N
+  testN.s2.out      - Expected file output (stage 2)
+  testN.s2.stdout.out - Expected stdout output (stage 2)
+
+MEMORY MANAGEMENT
+-----------------
+All dynamic allocations have corresponding free functions:
+  - free_ptrie()
+  - free_dict()
+  - free_record()
+  - free_result()
+  - free_list()
+
+Ensure proper cleanup to avoid memory leaks.
+
+CODE READING GUIDE
+------------------
+If you're new to this codebase, suggested reading order:
+  1. record.h/c    - Understand the data being stored
+  2. bit.h/c       - Learn bit manipulation utilities
+  3. list.h/c      - Simple linked list structure
+  4. ptrie.h/c     - Core trie data structure and algorithms
+  5. dict.h/c      - High-level dictionary interface
+  6. result.h/c    - Result formatting and metrics
+  7. main.c        - See how everything ties together
+
+PERFORMANCE CONSIDERATIONS
+---------------------------
+- Bit-level operations enable fine-grained prefix matching
+- Patricia Trie avoids redundant single-child nodes
+- Edit distance uses DP for O(m*n) fuzzy matching
+- Metrics tracking (bit_cmps, str_cmps) helps analyze performance
+
+FUTURE ENHANCEMENTS
+-------------------
+Potential improvements could include:
+  - Parallel query processing
+  - Trie serialization for faster loading
+  - Incremental updates (insert/delete)
+  - Alternative edit distance algorithms (e.g., Levenshtein automata)
+  - Cache-optimized node layout
+
+================================================================================
+For detailed technical documentation, see CLAUDE.md
+For build instructions and command-line usage, see comments in main.c
+================================================================================
