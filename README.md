@@ -1,6 +1,4 @@
-================================================================================
 ADDRESS DICTIONARY SEARCH SYSTEM - PROJECT OVERVIEW
-================================================================================
 
 PROJECT DESCRIPTION
 -------------------
@@ -140,4 +138,3 @@ Potential improvements could include:
   - Alternative edit distance algorithms (e.g., Levenshtein automata)
   - Cache-optimized node layout
 
-================================================================================
