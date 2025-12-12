@@ -141,6 +141,3 @@ Potential improvements could include:
   - Cache-optimized node layout
 
 ================================================================================
-For detailed technical documentation, see CLAUDE.md
-For build instructions and command-line usage, see comments in main.c
-================================================================================
